@@ -17,9 +17,16 @@ cassandra-bash:
 spark-bash:
 	docker exec -it spark bash;
 
+##############
+copy-spark-cassandra-connector:
+	docker cp path/to/spark-cassandra-connector spark:/opt/bitnami/workspace
+
 ###################### Utils ######################
 cassandra-status:
-	docker exec -ti cassandra nodetool status
+	docker exec -it cassandra nodetool status
+
+spark-status:
+	docker exec -it spark ./bin/spark-shell sc.parallelize( 1 to 50 ).sum()
 
 ###################### Start & stop ######################
 run-local: 
@@ -27,3 +34,13 @@ run-local:
 
 stop-local:
 	docker-compose down
+
+###################### Red zone ######################
+clean-volume:
+	docker volume rm cassandra-spark-docker_cassandra_data
+
+clean-all-volumes: # Clear all volumes
+	docker volume rm $$(docker volume ls -q)
+
+clean-all-images: # Clear all images
+	docker rmi $$(docker images -q)
