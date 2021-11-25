@@ -3,7 +3,7 @@ test:
 
 ###################### Main commands ######################
 # Creates a cassandra shell instance
-cqlsh:
+cassandra-shell:
 	docker exec -it cassandra cqlsh -u cassandra -p cassandra
 
 # Creates a spark shell instance
@@ -16,6 +16,10 @@ cassandra-bash:
 
 spark-bash:
 	docker exec -it spark bash;
+
+###################### Utils ######################
+cassandra-status:
+	docker exec -ti cassandra nodetool status
 
 ###################### Start & stop ######################
 run-local: 
