@@ -3,6 +3,7 @@ version: '2'
 services:
   cassandra:
     image: docker.io/bitnami/cassandra:4.0
+    user: root
     container_name: cassandra
     ports:
       - '7000:7000'
@@ -16,6 +17,7 @@ services:
 
   spark:
     image: docker.io/bitnami/spark:3
+    user: root
     container_name: spark
     environment:
       - SPARK_MODE=master

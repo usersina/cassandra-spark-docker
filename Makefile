@@ -1,10 +1,13 @@
 test:
 	echo "Make file is working!"
 
-cassandra-connection:
-	docker exec -ti cassandra cqlsh -u cassandra -p cassandra
+cqlsh: # Creates a cassandra shell
+	docker exec -it cassandra cqlsh -u cassandra -p cassandra
 
-run-local:
+spark-shell: # Creates a spark shell
+	docker exec -it spark ./bin/spark-shell
+
+run-local: 
 	docker-compose up -d
 
 stop-local:
