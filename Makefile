@@ -15,7 +15,7 @@ cassandra-bash:
 	docker exec -it cassandra bash;
 
 spark-bash:
-	docker exec -it spark bash;
+	docker exec -it spark /bin/bash
 
 ##############
 copy-spark-cassandra-connector:
