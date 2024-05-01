@@ -1,97 +1,102 @@
-# **Cassandra & Spark Dockerized**
+# Cassandra & Spark in Docker
+
 This repository is a preconfigured **Cassandra** & **Spark** playground.
 
-## **0. Prerequisites**
-- docker* (version 20 minimum)
-- docker-compose* (version 1.29 minimum) 
-- make (optional)
+## Prerequisites
 
-If make is not installed, you can check the `./Makefile` for the needed commands. 
+- [docker & docker-compose](https://www.docker.com/)
+- [go-task](https://taskfile.dev/)
 
-You can run the following commands to check whether docker & docker-compose are installed:
-- docker -v
-- docker-compose -v
+If Task is not installed, you can check the [Taskfile](./Taskfile.yml) for the commands.
 
-## **1. Start the containers**
-```BASH
-make run-local
+## Start the containers
+
+```bash
+task up
 ```
 
-## **2. Test the environment**
+## Test the environment
+
+Verify that cassandra is working
+
 ```BASH
-make cassandra-status
+task cassandra-status
 ```
 
+Verify that spark is working
+
 ```BASH
-make spark-shell # Connect to spark
+# Enter the spark shell
+task spark-shell
 
-sc.parallelize( 1 to 50 ).sum() # Execute a spark action
+# Execute a spark action
+sc.parallelize(1 to 50).sum()
 
-CTRL/CMD + C # Exit bash 
+# Exit
+CTRL/CMD+C
 ```
 
-## **3. Create some data in Cassandra**
-Open a bash instance in the **cassandra container** as follows
-```BASH
-make cassandra-shell
+## Create data in Cassandra
+
+```bash
+task cqlsh
 ```
 
 Create the `employees_keyspace` & use it
-```SQL
+
+```sql
 CREATE KEYSPACE employees_keyspace WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 1};
 USE employees_keyspace;
 ```
+
 Create an `employee_by_id` table & insert data to it
-```SQL
+
+```sql
 CREATE TABLE employee_by_id (id int PRIMARY KEY, name text, position text);
 INSERT INTO employee_by_id (id, name, position) VALUES(1, 'John', 'Manager');
 INSERT INTO employee_by_id (id, name, position) VALUES(2, 'Bob', 'Adminstrator');
 ```
-Check the data 
-```SQL
+
+Check the data
+
+```sql
 SELECT * FROM employee_by_id;
 ```
+
 Exit the cassandra container
-```SQL
-exit
+
+```bash
+CTRL + D
 ```
 
-## **4. Connecting to Spark**
-*   Connect to the **spark container** bash
+## Querying the data from spark
+
+Open a bash in the spark container
+
 ```BASH
-make spark-bash
+task spark-bash
 ```
 
-<!-- *   Install the **Spark Cassandra Connector**
-Already included in the next command
-```BASH
-$SPARK_HOME/bin/spark-shell --packages com.datastax.spark:spark-cassandra-connector_2.12:3.1.0
-$SPARK_HOME/bin/spark-submit --packages com.datastax.spark:spark-cassandra-connector_2.12:3.1.0
-``` -->
+Run spark shell with the [spark-cassandra-connector package](https://mvnrepository.com/artifact/com.datastax.spark/spark-cassandra-connector_2.12/3.5.0)
 
-*   Run the spark shell with custom configuration
 ```BASH
 $SPARK_HOME/bin/spark-shell \
     --conf spark.cassandra.connection.host=cassandra \
     --conf spark.cassandra.auth.username=cassandra \
     --conf spark.cassandra.auth.password=cassandra \
     --conf spark.sql.extensions=com.datastax.spark.connector.CassandraSparkExtensions \
-    --packages com.datastax.spark:spark-cassandra-connector_2.12:3.1.0 \
+    --conf spark.sql.catalog.mycatalog=com.datastax.spark.connector.datasource.CassandraCatalog \
+    --packages com.datastax.spark:spark-cassandra-connector_2.12:3.5.0
 ```
 
-## **5. Interacting with Cassandra's data from Spark**
+Query the previously created `employee_by_id` table
 
-*   Create a Catalog Reference to the **Cassandra Cluster**
-```SCALA
-spark.conf.set(s"spark.sql.catalog.mycatalog", "com.datastax.spark.connector.datasource.CassandraCatalog")
-```
-*   Query the previously created `employee_by_id` table
-```SCALA
+```scala
 spark.sql("SELECT * FROM mycatalog.employees_keyspace.employee_by_id").show
 ```
 
+## References
 
-### References:
-- https://github.com/datastax/spark-cassandra-connector/blob/master/doc/0_quick_start.md
-- https://github.com/datastax/spark-cassandra-connector/blob/master/doc/1_connecting.md
-- https://github.com/datastax/spark-cassandra-connector/blob/master/doc/reference.md
+- <https://github.com/datastax/spark-cassandra-connector/blob/master/doc/0_quick_start.md>
+- <https://github.com/datastax/spark-cassandra-connector/blob/master/doc/1_connecting.md>
+- <https://github.com/datastax/spark-cassandra-connector/blob/master/doc/reference.md>

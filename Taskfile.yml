@@ -1,0 +1,30 @@
+# https://taskfile.dev
+
+version: "3"
+
+silent: true
+
+tasks:
+  up:
+    cmd: docker-compose up -d
+
+  down:
+    cmd: docker-compose down
+
+  delete:
+    cmd: docker-compose down -v
+
+  spark-bash:
+    cmd: docker exec -it spark /bin/bash
+
+  spark-shell:
+    cmd: docker exec -it spark ./bin/spark-shell
+
+  cassandra-bash:
+    cmd: docker exec -it cassandra /bin/bash
+
+  cqlsh:
+    cmd: docker exec -it cassandra cqlsh -u cassandra -p cassandra
+
+  cassandra-status:
+    cmd: docker exec -it cassandra nodetool status
