@@ -1,0 +1,27 @@
+# https://taskfile.dev
+
+version: '3'
+
+silent: true
+
+vars:
+  HADOOP_NETWORK: hadoop_network
+
+tasks:
+  build-python:
+    desc: Build the Python example image
+    cmd: docker build -t python-example python
+
+  run-python:
+    desc: Run the Python example
+    env:
+      SPARK_LOCAL_IP: spark
+      HDFS_URL: hdfs://namenode:9000
+    cmd: |
+      echo "Running Python example"
+      docker run \
+        --rm -it --name temp_python_example \
+        --env SPARK_LOCAL_IP=$SPARK_LOCAL_IP \
+        --env HDFS_URL=$HDFS_URL \
+        --network {{.HADOOP_NETWORK}} \
+        python-example
