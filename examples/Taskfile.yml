@@ -15,7 +15,6 @@ tasks:
   run-python:
     desc: Run the Python example
     env:
-      SPARK_LOCAL_IP: spark
       HDFS_URL: hdfs://namenode:9000
     cmd: |
       echo "Running Python example"
