@@ -8,6 +8,7 @@ services:
       - '9042:9042'
     networks:
       - spark-net
+      - hadoop-net
     volumes:
       - 'cassandra_data:/var/lib/cassandra'
     environment:

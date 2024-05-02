@@ -5,22 +5,45 @@ version: '3'
 silent: true
 
 vars:
+  IMAGE_NAME: pyspark-process
   HADOOP_NETWORK: hadoop_network
+
+env:
+  SPARK_LOCAL_IP: 0.0.0.0
+  HDFS_URL: hdfs://namenode:9000
+  CASSANDRA_HOST: cassandra
+  CASSANDRA_USER: cassandra
+  CASSANDRA_PASSWORD: cassandra
 
 tasks:
   build-python:
     desc: Build the Python example image
-    cmd: docker build -t python-example python
+    cmd: docker build -t {{.IMAGE_NAME}} python
 
   run-python:
     desc: Run the Python example
-    env:
-      HDFS_URL: hdfs://namenode:9000
     cmd: |
       echo "Running Python example"
       docker run \
         --rm -it --name temp_python_example \
         --env SPARK_LOCAL_IP=$SPARK_LOCAL_IP \
         --env HDFS_URL=$HDFS_URL \
+        --env CASSANDRA_HOST=$CASSANDRA_HOST \
+        --env CASSANDRA_USER=$CASSANDRA_USER \
+        --env CASSANDRA_PASSWORD=$CASSANDRA_PASSWORD \
         --network {{.HADOOP_NETWORK}} \
-        python-example
+        {{.IMAGE_NAME}}
+
+  run-python-shell:
+    desc: Run the Python example shell
+    cmd: |
+      echo "Running Python example shell"
+      docker run \
+        --rm -it --name temp_python_example \
+        --env SPARK_LOCAL_IP=$SPARK_LOCAL_IP \
+        --env HDFS_URL=$HDFS_URL \
+        --env CASSANDRA_HOST=$CASSANDRA_HOST \
+        --env CASSANDRA_USER=$CASSANDRA_USER \
+        --env CASSANDRA_PASSWORD=$CASSANDRA_PASSWORD \
+        --network {{.HADOOP_NETWORK}} \
+        {{.IMAGE_NAME}} /bin/bash

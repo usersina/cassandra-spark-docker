@@ -3,9 +3,21 @@ import os
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import sum as _sum
 
-spark = (
-    SparkSession.builder.appName("Sales Analysis").getOrCreate()  # type: ignore
+spark: SparkSession = (
+    SparkSession.builder.appName("Sales Analysis")  # type: ignore
+    .config(
+        "spark.jars.packages",
+        # https://mvnrepository.com/artifact/com.datastax.spark/spark-cassandra-connector_2.12/3.5.0
+        "com.datastax.spark:spark-cassandra-connector_2.12:3.5.0",
+    )
+    .config("spark.cassandra.connection.host", os.environ["CASSANDRA_HOST"])
+    .config("spark.cassandra.auth.username", os.environ["CASSANDRA_USER"])
+    .config("spark.cassandra.auth.password", os.environ["CASSANDRA_PASSWORD"])
+    .getOrCreate()
 )
+
+if type(spark) != SparkSession:
+    raise Exception("Spark session not created")
 
 # Load the data from HDFS
 data = spark.read.csv(os.environ["HDFS_URL"] + "/purchases.txt", sep="\t", header=False)
@@ -28,3 +40,8 @@ result = data.groupBy("store").agg(_sum("cost").alias("total_sales"))
 
 # Print the result
 result.show()
+
+# Append the result to the sales_analytics table in the cleaned_data keyspace
+result.write.format("org.apache.spark.sql.cassandra").mode("append").option(
+    "keyspace", "cleaned_data"
+).option("table", "sales_analytics").save()
