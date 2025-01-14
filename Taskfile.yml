@@ -1,18 +1,15 @@
-# https://taskfile.dev
-
-version: '3'
-
+version: "3"
 silent: true
 
 tasks:
   up:
-    cmd: docker-compose up -d
+    cmd: docker compose up -d
 
   down:
-    cmd: docker-compose down
+    cmd: docker compose down
 
   delete:
-    cmd: docker-compose down -v
+    cmd: docker compose down -v
 
   spark-bash:
     cmd: docker exec -it spark /bin/bash
