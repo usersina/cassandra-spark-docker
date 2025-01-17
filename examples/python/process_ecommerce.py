@@ -20,14 +20,14 @@ def create_keyspace_and_table():
         WITH REPLICATION = { 'class': 'SimpleStrategy', 'replication_factor': 1 }
     """)
 
-    print("Dropping table if it exists...")
-    session.execute("""
-        DROP TABLE IF EXISTS cleaned_data.ecommerce_transactions
-    """)
+    # print("Dropping table if it exists...")
+    # session.execute("""
+    #     DROP TABLE IF EXISTS cleaned_data.ecommerce_transactions
+    # """)
 
-    print("Creating table...")
+    print("Creating table if it does not...")
     session.execute("""
-        CREATE TABLE cleaned_data.ecommerce_transactions (
+        CREATE TABLE IF NOT EXISTS cleaned_data.ecommerce_transactions (
             transaction_id UUID PRIMARY KEY,
             user_id INT,
             product_id INT,
