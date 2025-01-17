@@ -1,7 +1,4 @@
-# https://taskfile.dev
-
-version: '3'
-
+version: "3"
 silent: true
 
 vars:
@@ -16,25 +13,27 @@ env:
   CASSANDRA_PASSWORD: cassandra
 
 tasks:
-  build-python:
-    desc: Build the Python example image
+  build:
+    desc: Build the python image for pyspark
     cmd: docker build -t {{.IMAGE_NAME}} python
 
-  run-python:
-    desc: Run the Python example
+  run:
+    desc: Run the provided script
+    requires:
+      vars: [SCRIPT]
     cmd: |
-      echo "Running Python example"
+      echo "Running the script '{{.SCRIPT}}'"
       docker run \
-        --rm -it --name temp_python_example \
-        --env SPARK_LOCAL_IP=$SPARK_LOCAL_IP \
-        --env HDFS_URL=$HDFS_URL \
-        --env CASSANDRA_HOST=$CASSANDRA_HOST \
-        --env CASSANDRA_USER=$CASSANDRA_USER \
-        --env CASSANDRA_PASSWORD=$CASSANDRA_PASSWORD \
-        --network {{.HADOOP_NETWORK}} \
-        {{.IMAGE_NAME}}
+      --rm -it --name temp_python_example \
+      --env SPARK_LOCAL_IP=$SPARK_LOCAL_IP \
+      --env HDFS_URL=$HDFS_URL \
+      --env CASSANDRA_HOST=$CASSANDRA_HOST \
+      --env CASSANDRA_USER=$CASSANDRA_USER \
+      --env CASSANDRA_PASSWORD=$CASSANDRA_PASSWORD \
+      --network {{.HADOOP_NETWORK}} \
+      {{.IMAGE_NAME}} python {{.SCRIPT}}
 
-  run-python-shell:
+  shell:
     desc: Run the Python example shell
     cmd: |
       echo "Running Python example shell"
